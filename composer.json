@@ -1,0 +1,24 @@
+{
+    "name": "renanhangai/validator",
+    "description": "Validator utility",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "renanhangai",
+            "email": "hangai.renan@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
+    },
+	"scripts": {
+		"test": "phpunit --configuration src/phpunit.xml"
+	},
+	"autoload": {
+		"psr-4": {
+			"LibWeb\\": "src"
+		}
+	}
+}

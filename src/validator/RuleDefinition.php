@@ -1,6 +1,8 @@
 <?php
 namespace LibWeb\validator;
 
+use LibWeb\Validator;
+
 class RuleDefinition {
 
 	/**
@@ -33,21 +35,24 @@ class RuleDefinition {
 	}
 
 	/*
-	  
+	  Obligatoriness validators
 	 */
+	/// Optional
 	public static function optional__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
 			$state->setDone();
 		}
-	}	
+	}
+	/// Required
 	public static function required__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
 			$state->addError( "Field is required" );
 			$state->setDone();
 		}
-	}	
+	}
+	/// Skippable (only makes senses on objects)
 	public static function skippable__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
@@ -69,12 +74,6 @@ class RuleDefinition {
 		return new rule\RuleInline( $fn, array(), 'call' );
 	}
 
-	/// obj
-	public static function obj__factory( $definition ) {
-		return new rule\RuleObject( $definition );
-	}
-
-	
 	/*
 	  Type validators
 	 */
@@ -87,11 +86,14 @@ class RuleDefinition {
 		return self::s( $value, $trim );
 	}
 	public static function s( $value, $trim = true ) {
-		if ( is_object( $value ) ) {
+		if ( is_array( $value ) )
+			throw new RuleException( "Array cannot be converted to string." );
+		else if ( is_object( $value ) ) {
 			if ( !method_exists( $value, '__toString' ) )
 				throw RuleException::createWithValue( "Object cannot be converted to string.", $value );
 			$value = (string) $value;
-		}
+		} else if ( $value === true || $value === false )
+			throw RuleException::createWithValue( "Boolean cannot be converted to string.", $value );
 		if ( $trim !== false )
 			return trim( $value );
 		else
@@ -150,10 +152,10 @@ class RuleDefinition {
 		return self::b( $value );
 	}
 	public static function b( $value ) {
-		if ( !$value || ($value === 'false') )
-		    return new rule\InlineRuleValue( false );
+		if ( ($value === '0' ) || ( $value === 0 ) || ( $value === false ) || ($value === 'false') )
+		    return new rule\RuleInlineValue( false );
 		else if ( ( $value === true ) || ( $value === 'true' ) || ( $value == '1' ) )
-		    return new rule\InlineRuleValue( true );
+		    return new rule\RuleInlineValue( true );
 		else
 			throw RuleException::createWithValue( "Value must be a boolean.", $value );
 	}
@@ -162,6 +164,87 @@ class RuleDefinition {
 		if ( !$value instanceof $type )
 			throw RuleException::createWithValue( "Value must be of type $type.", $value );
 	}
+	/// Convert to an object
+	public static function obj__factory( $definition ) {
+		return new rule\RuleObject( $definition );
+	}	
+	/// Tests every element on the array against the validator
+	public static function arrayOf__raw( $state, $rule ) {
+		$value = &$state->value;
+		if ( !is_array( $value ) ) {
+			$state->addError( RuleException::createWithValue( "Value must be an array.", $value ) );
+			return;
+		}
+		
+		$rule = Validator::normalizeRule( $rule );
+		foreach ( $value as $key => &$v ) {
+			$child = new State( $v, $key, $state );
+			Validator::validateState( $child, $rule );
+			$state->mergeErrorsFrom( $child );
+			$v = $child->value;
+		}
+	}
+
+	/*==============================
+	  
+	  String rules
+
+	 =================================*/
+	public static function regex( $value, $pattern ) {
+		$value = self::s( $value, false );
+	    $match = preg_match( $pattern, $value );
+		if ( !$match )
+			throw RuleException::createWithValue( "Value must match Regex '".$pattern."'.", $value );
+		return $value;
+	}
+	public static function len( $value, $min, $max = null ) {
+		$len = is_array( $value ) ? count( $value ) : strlen( $value );
+		if ( $max === null )
+			$max = $min;
+		
+		if ( ( $len > $max ) && ( $max > 0 ) )
+			throw new RuleException( "Maximun lenght must be ".$max );
+		else if ( $len < $min )
+			throw new RuleException( "Minimun lenght must be ".$min );
+		return true;
+	}
+	public static function minlen( $value, $min ) {
+		$len = is_array( $value ) ? count( $value ) : strlen( $value );
+	    if ( $len < $min )
+			throw new RuleException( "Minimun lenght must be ".$min );
+		return true;
+	}
+	public static function str_replace( $value, $search, $replace ) {
+		return str_replace( $search, $replace, $value );
+	}
+	public static function preg_replace( $value, $search, $replace ) {
+		if ( is_string( $replace ) )
+			return preg_replace( $search, $replace, $value );
+		else if ( is_callable( $replace ) )
+			return preg_replace_callback( $search, $replace, $value );
+		else
+			throw new \InvalidArgumentException( "Parameter to replace must be a callback, or a string" );
+	}
+	public static function blacklist( $value, $chars ) {
+		$out = array();
+		for ( $i = 0, $len = strlen( $value ); $i < $len; ++$i ) {
+			$c = $value[ $i ];
+			if ( strpos( $chars, $c ) === false )
+				$out[] = $c;
+		}
+		return implode( "", $out );
+	}
+	public static function whitelist( $value, $chars ) {
+		$out = array();
+		for ( $i = 0, $len = strlen( $value ); $i < $len; ++$i ) {
+			$c = $value[ $i ];
+			if ( strpos( $chars, $c ) !== false )
+				$out[] = $c;
+		}
+		return implode( "", $out );
+	}
+	
+
 	
 	/// Brazilian CPF validator
 	public static function cpf( $cpf ) {

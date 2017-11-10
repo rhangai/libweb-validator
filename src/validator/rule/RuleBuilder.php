@@ -24,16 +24,27 @@ class RuleBuilder implements Rule {
 	// Apply the rules
 	public function __call( $method, $args ) {
 		$rule = RuleDefinition::getRule( $method, $args );
-		$this->appendRule( $rule );
-		return $this;
+		return $this->appendRule( $rule );
 	}
 	// Add a new rule to the beginning of the chain
 	public function prependRule( $rule ) {
-		array_unshift( $this->chain_, $rule );
+		if ( !$rule instanceof Rule )
+			throw new \InvalidArgumentException( "Rule is not an instance of Rule" );
+		else if ( $rule instanceof RuleBuilder )
+			$this->chain_ = array_merge( $rule->chain_, $this->chain_ );
+		else
+			array_unshift( $this->chain_, $rule );
+		return $this;
 	}
 	// Append a new rule to the end of the chain
 	public function appendRule( $rule ) {
-		$this->chain_[] = $rule;
+		if ( !$rule instanceof Rule )
+			throw new \InvalidArgumentException( "Rule is not an instance of Rule" );
+		else if ( $rule instanceof RuleBuilder )
+			$this->chain_ = array_merge( $this->chain_, $rule->chain_ );
+		else
+			$this->chain_[] = $rule;
+		return $this;
 	}
 	// Chain
 	private $chain_ = array();

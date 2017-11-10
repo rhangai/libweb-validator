@@ -3,7 +3,8 @@
 	"description": "Validate any php variable using a very simple sintax.",
 	"keywords": [
 		"validator",
-		"validate"
+		"validate",
+		"simple"
 	],
 	"type": "library",
 	"license": "MIT",

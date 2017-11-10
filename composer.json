@@ -1,7 +1,7 @@
 {
 	"name": "renanhangai/validator",
 	"description": "Validate any php variable using a very simple sintax.",
-	"keywords": "validator validate",
+	"keywords": ["validator", "validate"],
 	"type": "library",
 	"license": "MIT",
 	"authors": [

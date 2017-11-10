@@ -5,12 +5,23 @@ use LibWeb\Validator;
 
 class RuleDefinition {
 
+	// A few aliases
+	private static $alias = array(
+		's' => 'strval',
+		'i' => 'intval',
+		'f' => 'floatval',
+		'b' => 'boolval'
+	);
 	/**
 	 * Get a single rule definition
 	 */
 	public static function getRule( $name, $args ) {
 		if ( $name === 'getRule' )
 			throw new \InvalidArgumentException( "'getRule' is a reserved name" );
+
+		/// Check for alias
+		if ( isset( self::$alias[$name] ) )
+			$name = self::$alias[$name];
 
 		// Try to get inline rules
 		$inlineName = __CLASS__.'::'.$name;
@@ -83,9 +94,6 @@ class RuleDefinition {
 	}
 	// String value
 	public static function strval( $value, $trim = true ) {
-		return self::s( $value, $trim );
-	}
-	public static function s( $value, $trim = true ) {
 		if ( is_array( $value ) )
 			throw new RuleException( "Array cannot be converted to string." );
 		else if ( is_object( $value ) ) {
@@ -97,13 +105,10 @@ class RuleDefinition {
 		if ( $trim !== false )
 			return trim( $value );
 		else
-			return strval( $value );
+			return (string) $value;
 	}
 	// Int value
 	public static function intval( $value ) {
-		return self::i( $value );
-	}
-	public static function i( $value ) {
 		$error = false;
 		if ( is_int( $value ) ) {
 		    return true;
@@ -117,9 +122,6 @@ class RuleDefinition {
 
 	// Float value
 	public static function floatval( $value, $decimal = null, $thousands = null ) {
-		return self::f( $value, $decimal, $thousands );
-	}
-	public static function f( $value, $decimal = null, $thousands = null ) {
 		$error = false;
 		if ( $decimal === null )
 			$decimal   = '.';
@@ -149,9 +151,6 @@ class RuleDefinition {
 	}
 	// Boolean value
 	public static function boolval( $value ) {
-		return self::b( $value );
-	}
-	public static function b( $value ) {
 		if ( ($value === '0' ) || ( $value === 0 ) || ( $value === false ) || ($value === 'false') )
 		    return new rule\RuleInlineValue( false );
 		else if ( ( $value === true ) || ( $value === 'true' ) || ( $value == '1' ) )
@@ -185,23 +184,44 @@ class RuleDefinition {
 		}
 	}
 
+
+	/*==============================
+	   Numeric rules
+	 ==============================*/
+	public static function range( $value, $min, $max ) {
+		if ( is_int( $value ) ) {
+			if ( ( $value < $min ) || ( $value > $max ) )
+				throw RuleException::createWithValue( "Value must be between [$min, $max].", $value );
+		} else if ( is_float( $value ) ) {
+			if ( ( $value < $min ) || ( $value > $max ) )
+				throw RuleException::createWithValue( "Value must be between [$min, $max].", $value );
+		} else
+			throw RuleException::createWithValue( "Cannot validate range [$min, $max].", $value );
+	}
+
+
 	/*==============================
 	  
 	  String rules
 
 	 =================================*/
 	public static function regex( $value, $pattern ) {
-		$value = self::s( $value, false );
+		$value = self::strval( $value, false );
 	    $match = preg_match( $pattern, $value );
 		if ( !$match )
 			throw RuleException::createWithValue( "Value must match Regex '".$pattern."'.", $value );
 		return $value;
 	}
 	public static function len( $value, $min, $max = null ) {
-		$len = is_array( $value ) ? count( $value ) : strlen( $value );
+		$len = null;
+		if ( is_array( $value ) || ( $value instanceof \Countable ) )
+			$len = count( $value );
+		else if ( is_string( $value ) )
+			$len = strlen( $value );
+		if ( $len === null )
+			throw RuleException::createWithValue( "Cannot get length.", $value );
 		if ( $max === null )
 			$max = $min;
-		
 		if ( ( $len > $max ) && ( $max > 0 ) )
 			throw new RuleException( "Maximun lenght must be ".$max );
 		else if ( $len < $min )
@@ -209,15 +229,14 @@ class RuleDefinition {
 		return true;
 	}
 	public static function minlen( $value, $min ) {
-		$len = is_array( $value ) ? count( $value ) : strlen( $value );
-	    if ( $len < $min )
-			throw new RuleException( "Minimun lenght must be ".$min );
-		return true;
+		return self::len( $value, $min, INF );
 	}
 	public static function str_replace( $value, $search, $replace ) {
+		$value = self::strval( $value, false );
 		return str_replace( $search, $replace, $value );
 	}
 	public static function preg_replace( $value, $search, $replace ) {
+		$value = self::strval( $value, false );
 		if ( is_string( $replace ) )
 			return preg_replace( $search, $replace, $value );
 		else if ( is_callable( $replace ) )
@@ -226,6 +245,8 @@ class RuleDefinition {
 			throw new \InvalidArgumentException( "Parameter to replace must be a callback, or a string" );
 	}
 	public static function blacklist( $value, $chars ) {
+		$value = self::strval( $value, false );
+
 		$out = array();
 		for ( $i = 0, $len = strlen( $value ); $i < $len; ++$i ) {
 			$c = $value[ $i ];
@@ -235,6 +256,8 @@ class RuleDefinition {
 		return implode( "", $out );
 	}
 	public static function whitelist( $value, $chars ) {
+		$value = self::strval( $value, false );
+
 		$out = array();
 		for ( $i = 0, $len = strlen( $value ); $i < $len; ++$i ) {
 			$c = $value[ $i ];
@@ -245,7 +268,9 @@ class RuleDefinition {
 	}
 	
 
-	
+	/*
+	  Locale validators
+	 */
 	/// Brazilian CPF validator
 	public static function cpf( $cpf ) {
 		$cpf = preg_replace('/[^0-9]/', '', (string) $cpf);

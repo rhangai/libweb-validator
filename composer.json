@@ -1,7 +1,10 @@
 {
 	"name": "renanhangai/validator",
 	"description": "Validate any php variable using a very simple sintax.",
-	"keywords": ["validator", "validate"],
+	"keywords": [
+		"validator",
+		"validate"
+	],
 	"type": "library",
 	"license": "MIT",
 	"authors": [
@@ -28,5 +31,5 @@
 			"LibWeb\\": "src"
 		}
 	},
-	"version": "1.0.2"
+	"version": "1.0.3"
 }

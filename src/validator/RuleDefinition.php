@@ -13,14 +13,14 @@ class RuleDefinition {
 		// Try to get inline rules
 		$inlineName = __CLASS__.'::'.$name;
 		if ( is_callable( $inlineName ) )
-			return new rule\RuleInline( $inlineName, $args, $name );
+			return new rule\RuleInline( $inlineName, $args, 'v::'.$name );
 
 		// Try to get inline raw rules
 		$rawName = __CLASS__.'::'.$name.'__raw';
 		if ( is_callable( $rawName ) ) {
 			$rawSetupName = __CLASS__.'::'.$name.'__rawSetup';
 			$setup = is_callable( $rawSetupName ) ? $rawSetupName : null;
-			return new rule\RuleInlineRaw( $rawName, $setup, $args, $name );
+			return new rule\RuleInlineRaw( $rawName, $setup, $args, 'v::'.$name );
 		}
 
 		// Try to get factory rules
@@ -156,9 +156,78 @@ class RuleDefinition {
 		    return new rule\InlineRuleValue( true );
 		else
 			throw RuleException::createWithValue( "Value must be a boolean.", $value );
-
 	}
+	/// Check for type
+	public static function is( $value, $type ) {
+		if ( !$value instanceof $type )
+			throw RuleException::createWithValue( "Value must be of type $type.", $value );
+	}
+	
+	/// Brazilian CPF validator
+	public static function cpf( $cpf ) {
+		$cpf = preg_replace('/[^0-9]/', '', (string) $cpf);
 
+		// Valida tamanho
+		if (strlen($cpf) != 11)
+			throw new RuleException( "CPF must be length 11" );
+		$all_equals = true;
+		for ( $i = 1; $i<11; ++$i ) {
+			if ( $cpf[$i] !== $cpf[$i-1] ) {
+				$all_equals = false;
+				break;
+			}
+		}
+		if ( $all_equals )
+			throw new RuleException( "CPF must have different digits" );
+		// Calcula e confere primeiro dígito verificador
+		for ($i = 0, $j = 10, $soma = 0; $i < 9; $i++, $j--)
+			$soma += $cpf{$i} * $j;
+		$resto = $soma % 11;
+		if ($cpf{9} != ($resto < 2 ? 0 : 11 - $resto))
+			throw new RuleException( "Invalid CPF" );
+		// Calcula e confere segundo dígito verificador
+		for ($i = 0, $j = 11, $soma = 0; $i < 10; $i++, $j--)
+			$soma += $cpf{$i} * $j;
+		$resto = $soma % 11;
+		if ( $cpf{10} != ($resto < 2 ? 0 : 11 - $resto) )
+			throw new RuleException( "Invalid CPF" );
+		return $cpf;
+	}
+	// Brazilian CNPJ validator
+	public static function cnpj( $cnpj ) {
+		$cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
+		// Valida tamanho
+		if (strlen($cnpj) != 14)
+			throw new RuleException( "CNPJ must have length 14" );
+		$all_equals = true;
+		for ( $i = 1; $i<14; ++$i ) {
+			if ( $cnpj[$i] !== $cnpj[$i-1] ) {
+				$all_equals = false;
+				break;
+			}
+		}
+		if ( $all_equals )
+			throw new RuleException( "Invalid CNPJ" );
+		// Valida primeiro dígito verificador
+		for ($i = 0, $j = 5, $soma = 0; $i < 12; $i++)
+		{
+			$soma += $cnpj{$i} * $j;
+			$j = ($j == 2) ? 9 : $j - 1;
+		}
+		$resto = $soma % 11;
+		if ($cnpj{12} != ($resto < 2 ? 0 : 11 - $resto))
+			throw new RuleException( "Invalid CNPJ" );
+		// Valida segundo dígito verificador
+		for ($i = 0, $j = 6, $soma = 0; $i < 13; $i++)
+		{
+			$soma += $cnpj{$i} * $j;
+			$j = ($j == 2) ? 9 : $j - 1;
+		}
+		$resto = $soma % 11;
+		if ( $cnpj{13} != ($resto < 2 ? 0 : 11 - $resto) )
+			throw new RuleException( "Invalid CNPJ" );
+		return $cnpj;
+	}
 
 
 };

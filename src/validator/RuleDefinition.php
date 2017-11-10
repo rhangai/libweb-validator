@@ -52,17 +52,15 @@ class RuleDefinition {
 		throw new \InvalidArgumentException( "Invalid rule: ".$name );
 	}
 
-	/*
-	  Obligatoriness validators
-	 */
-	/// Optional
+	// =============== Obligatoriness ================
+	/** Optional validator (Bypass if null or '') */
 	public static function optional__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
 			$state->setDone();
 		}
 	}
-	/// Required
+	/** Required validator (Fails if null or '') */
 	public static function required__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
@@ -70,7 +68,7 @@ class RuleDefinition {
 			$state->setDone();
 		}
 	}
-	/// Skippable (only makes senses on objects)
+	/** Skippable validator (Bypass if null or '' and does not set the property) */
 	public static function skippable__raw( $state ) {
 		if ( ( $state->value === null ) || ( $state->value === '' ) ) {
 			$state->value = null;
@@ -80,26 +78,26 @@ class RuleDefinition {
 	}
 
 
-	/// Add a rule dependency
+	// =============== Meta ================
+	/** Add a rule dependency. (Only works for objects) */
 	public static function dependsOn__raw( $state ) {
 	}
 	public static function dependsOn__rawSetup( $state, $fields ) {
 		$state->dependsOn( $fields );
 	}
 
-	/// call
+	// ============== Mixed ================
+	/// Call the function $fn to validate the value
 	public static function call__factory( $fn ) {
 		return new rule\RuleInline( $fn, array(), 'call' );
 	}
 
-	/*
-	  Type validators
-	 */
-	// Any validator
+	// =============== Type validators ================
+	/// Validate all objects
 	public static function any( $value ) {
 		return true;
 	}
-	// String value
+	/// Convert the object to a string value
 	public static function strval( $value, $trim = true ) {
 		if ( is_array( $value ) )
 			throw new RuleException( "Array cannot be converted to string." );
@@ -114,7 +112,7 @@ class RuleDefinition {
 		else
 			return (string) $value;
 	}
-	// Int value
+	/// Convert the value to an int and fails if cannot be safely convertible
 	public static function intval( $value ) {
 		$error = false;
 		if ( is_int( $value ) ) {
@@ -126,7 +124,7 @@ class RuleDefinition {
 		} else
 			throw RuleException::createWithValue( "Value must be an int.", $value );
 	}
-	// Float value
+	/// Convert the value to a float
 	public static function floatval( $value, $decimal = null, $thousands = null, $asString = false ) {
 		$error = false;
 		if ( $decimal === null )
@@ -160,7 +158,7 @@ class RuleDefinition {
 		} else
 			throw RuleException::createWithValue( "Value must be a float.", $value );
 	}
-	// Boolean value
+	/// Convert the value to a boolean
 	public static function boolval( $value ) {
 		if ( ($value === '0' ) || ( $value === 0 ) || ( $value === false ) || ($value === 'false') )
 		    return new rule\RuleInlineValue( false );
@@ -169,7 +167,7 @@ class RuleDefinition {
 		else
 			throw RuleException::createWithValue( "Value must be a boolean.", $value );
 	}
-	// Decimal value
+	// Check for decimal
 	public static function decimal__check( $digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null ) {
 		if ( !is_int( $digits ) || ( $digits <= 1 ) )
 			throw new \InvalidArgumentException( "Digis must be a positive integral > 1. $digits given" );
@@ -180,6 +178,7 @@ class RuleDefinition {
 		if ( !class_exists( '\\RtLopez\\Decimal' ) )
 			throw new \LogicException( "You must install rtlopez/decimal for decimal validator to work" );
 	}
+	/// Convert the value to a decimal with $digits and $decimal (needs rtlopes\Decimal)
 	public static function decimal( $value, $digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null ) {
 		if ( $value instanceof \RtLopez\Decimal )
 			$value = $value->format( null, '.', '' );
@@ -200,17 +199,16 @@ class RuleDefinition {
 		
 		return $value;
 	}
-
-	/// Check for type
+	/// Check if the object is an instance of the given type
 	public static function instanceOf( $value, $type ) {
 		if ( !$value instanceof $type )
 			throw RuleException::createWithValue( "Value must be of type $type.", $value );
 	}
-	/// Convert to an object
+	/// Convert the value to an object and validate its fields
 	public static function obj__factory( $definition ) {
 		return new rule\RuleObject( $definition );
 	}	
-	/// Tests every element on the array against the validator
+	/// Validate every element on the array against the $rule
 	public static function arrayOf__raw( $state, $rule ) {
 		$value = &$state->value;
 		if ( !is_array( $value ) ) {
@@ -228,9 +226,8 @@ class RuleDefinition {
 	}
 
 
-	/*==============================
-	   Numeric rules
-	 ==============================*/
+	// ================ Numeric rules =======================
+	/// Range validator
 	public static function range( $value, $min, $max ) {
 		if ( is_int( $value ) ) {
 			if ( ( $value < $min ) || ( $value > $max ) )
@@ -243,11 +240,8 @@ class RuleDefinition {
 	}
 
 
-	/*==============================
-	  
-	  String rules
-
-	 =================================*/
+	// ================ String rules ====================
+	/// Validate the value against the $pattern
 	public static function regex( $value, $pattern ) {
 		$value = self::strval( $value, false );
 	    $match = preg_match( $pattern, $value );
@@ -255,6 +249,7 @@ class RuleDefinition {
 			throw RuleException::createWithValue( "Value must match Regex '".$pattern."'.", $value );
 		return $value;
 	}
+	/// Check for string or array length
 	public static function len( $value, $min, $max = null ) {
 		$len = null;
 		if ( is_array( $value ) || ( $value instanceof \Countable ) )
@@ -271,13 +266,16 @@ class RuleDefinition {
 			throw new RuleException( "Minimun lenght must be ".$min );
 		return true;
 	}
+	/// Check if string has at least $min length
 	public static function minlen( $value, $min ) {
 		return self::len( $value, $min, INF );
 	}
+	/// Replace the characters on the string
 	public static function str_replace( $value, $search, $replace ) {
 		$value = self::strval( $value, false );
 		return str_replace( $search, $replace, $value );
 	}
+	/// Replace the $search pattern on the string using $replace (Callback or string)
 	public static function preg_replace( $value, $search, $replace ) {
 		$value = self::strval( $value, false );
 		if ( is_string( $replace ) )
@@ -287,6 +285,7 @@ class RuleDefinition {
 		else
 			throw new \InvalidArgumentException( "Parameter to replace must be a callback, or a string" );
 	}
+	/// Remove any char found in $chars from the string
 	public static function blacklist( $value, $chars ) {
 		$value = self::strval( $value, false );
 
@@ -298,6 +297,7 @@ class RuleDefinition {
 		}
 		return implode( "", $out );
 	}
+	/// Remove any char NOT found in $chars from the string
 	public static function whitelist( $value, $chars ) {
 		$value = self::strval( $value, false );
 
@@ -309,11 +309,8 @@ class RuleDefinition {
 		}
 		return implode( "", $out );
 	}
-	
 
-	/*
-	  Locale validators
-	 */
+	// ================ Locale rules =======================
 	/// Brazilian CPF validator
 	public static function cpf( $cpf ) {
 		$cpf = preg_replace('/[^0-9]/', '', (string) $cpf);
@@ -344,7 +341,7 @@ class RuleDefinition {
 			throw new RuleException( "Invalid CPF" );
 		return $cpf;
 	}
-	// Brazilian CNPJ validator
+	/// Brazilian CNPJ validator
 	public static function cnpj( $cnpj ) {
 		$cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
 		// Valida tamanho

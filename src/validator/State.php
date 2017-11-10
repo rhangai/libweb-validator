@@ -54,6 +54,12 @@ class State {
 	/**
 	 * Get the dependencies on the state
 	 */
+	public function addDependency( $field ) {
+	    $this->dependencies_[] = $field;
+	}
+	/**
+	 * Get the dependencies on the state
+	 */
 	public function getDependencies() {
 		return $this->dependencies_;
 	}
@@ -67,11 +73,11 @@ class State {
 		}
 
 		if ( $exception instanceof RuleException ) {
-			$message = ( $message ? $message."\n" : "" ) . $exception->getMessage();
+			$message = ( $message ? $message." - " : "" ) . $exception->getMessage();
 		} else if ( !$exception instanceof \Exception ) {
 			$exception = null;
 		}
-	    $this->errors_[] = array(
+	    $this->errors_[] = (object) array(
 			"key"       => $this->getKey(),
 			"message"   => $message,
 			"exception" => $exception,

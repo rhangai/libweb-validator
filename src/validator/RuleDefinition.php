@@ -208,6 +208,10 @@ class RuleDefinition {
 	public static function obj__factory( $definition ) {
 		return new rule\RuleObject( $definition );
 	}	
+	/// Convert the value to a date using the format (or keep if alredy a \DateTime)
+	public static function date__factory( $format = null, $out = null ) {
+		return new rule\RuleDate( $format, $out );
+	}	
 	/// Validate every element on the array against the $rule
 	public static function arrayOf__raw( $state, $rule ) {
 		$value = &$state->value;

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "04b880e599261645fb7747800ad98c16",
+    "content-hash": "a393a3c5bc45fea9066641eaf0824bc8",
     "packages": [
         {
             "name": "marcj/topsort",
@@ -857,6 +857,61 @@
                 "xunit"
             ],
             "time": "2017-08-03T14:08:16+00:00"
+        },
+        {
+            "name": "rtlopez/decimal",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rtlopez/decimal.git",
+                "reference": "3d27c9c76fa7b7e6e16ee536f3093e3c17bd54b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rtlopez/decimal/zipball/3d27c9c76fa7b7e6e16ee536f3093e3c17bd54b0",
+                "reference": "3d27c9c76fa7b7e6e16ee536f3093e3c17bd54b0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-bcmath": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "RtLopez\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "rtlopez",
+                    "email": "rtlopezdev@gamil.com",
+                    "homepage": "https://github.com/rtlopez"
+                }
+            ],
+            "description": "An object oriented immutable arbitrary-precision arithmetic library for PHP",
+            "homepage": "https://github.com/rtlopez/decimal",
+            "keywords": [
+                "bcmath",
+                "big decimal",
+                "bignum",
+                "decimal",
+                "financial",
+                "gmp",
+                "immutable",
+                "large numbers",
+                "money",
+                "numbers",
+                "numeric"
+            ],
+            "time": "2017-02-24T11:11:24+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

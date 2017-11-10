@@ -59,6 +59,15 @@ $data = v::validate( $data, array(
 ));
 ```
 
+
+Chainability
+-------------------------------------
+Every method can be chained by using `->`
+```php
+v::s()->str_replace( "foo", "bar" )->regex('/testbar$/')->minlen(10)
+// Will pass on "mytestfoo", "another_testfoo", "testbar", "mytestbar"
+```
+
 <a name="api"></a>
 API Reference
 ======================

@@ -9,6 +9,9 @@ class Validator {
 	/// Validate a value against a rule
 	public static function validate( $value, $rule ) {
 		$state = new validator\State( $value );
+		self::validateState( $state, self::required() );
+		if ( $state->getErrors() )
+			throw new ValidatorException( $state );
 		self::validateState( $state, $rule );
 		if ( $state->getErrors() )
 			throw new ValidatorException( $state );

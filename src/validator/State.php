@@ -46,6 +46,12 @@ class State {
 		return $this->getter_->validatorGet( $key );
 	}
 	/**
+	 * Set the rule used to validate a single key
+	 */
+	public function setCurrentRuleFor( $key, $rule ) {
+		$this->subrules_[ $key ] = $rule;
+	}
+	/**
 	 * Create a dependency on the given key
 	 */
 	public function dependsOn( $key ) {
@@ -116,6 +122,7 @@ class State {
 	private $parent_;
 	private $getter_;
 	private $done_;
+	private $subrules_ = array();
 	private $errors_ = array();
 	private $dependencies_ = array();
 };

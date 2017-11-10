@@ -3,6 +3,7 @@ namespace LibWeb\validator\rule;
 
 use LibWeb\Validator;
 use LibWeb\validator\Rule;
+use LibWeb\validator\RuleDefinition;
 
 class RuleBuilder implements Rule {
 
@@ -22,7 +23,7 @@ class RuleBuilder implements Rule {
 	}
 	// Apply the rules
 	public function __call( $method, $args ) {
-		$rule = RuleDefinition::get( $method, $args );
+		$rule = RuleDefinition::getRule( $method, $args );
 		$this->appendRule( $rule );
 		return $this;
 	}

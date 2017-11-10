@@ -17,6 +17,7 @@ class Validator {
 	/// Validate the state object
 	public static function validateState( $state, $rule ) {
 		$rule = self::normalizeRule( $rule );
+		$rule->setup( $state );
 		$rule->apply( $state );
 	}
 	/// Normalize a rule

@@ -9,7 +9,9 @@
             "email": "hangai.renan@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "marcj/topsort": "^1.1"
+    },
     "require-dev": {
         "phpunit/phpunit": "^6.4"
     },

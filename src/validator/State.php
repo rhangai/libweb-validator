@@ -58,6 +58,38 @@ class State {
 		return $this->dependencies_;
 	}
 	/**
+	 * Add a new error on the given state
+	 */
+	public function addError( $message, $exception = null ) {
+		if ( $message instanceof \Exception ) {
+			$exception = $message;
+			$message   = "";
+		}
+
+		if ( $exception instanceof RuleException ) {
+			$message = ( $message ? $message."\n" : "" ) . $exception->getMessage();
+		} else if ( !$exception instanceof \Exception ) {
+			$exception = null;
+		}
+	    $this->errors_[] = array(
+			"key"       => $this->getKey(),
+			"message"   => $message,
+			"exception" => $exception,
+		);
+	}
+	/**
+	 * Merge the errors from another state
+	 */
+	public function mergeErrorsFrom( $state ) {
+		$this->errors_ = array_merge( $this->errors_, $state->getErrors() );
+	}
+	/**
+	 * Get the errors
+	 */
+	public function getErrors() {
+		return $this->errors_;
+	}
+	/**
 	 * Create a getter for subdata to validate
 	 */
 	private static function createGetterFor( $value ) {
@@ -78,5 +110,6 @@ class State {
 	private $parent_;
 	private $getter_;
 	private $done_;
+	private $errors_ = array();
 	private $dependencies_ = array();
 };

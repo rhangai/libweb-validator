@@ -10,6 +10,8 @@ class RuleException extends \Exception {
 			$message .= " Passed Object(".get_class( $value ).")";
 		else if ( is_array( $value ) )
 			$message .= " Passed Array";
+		else if ( is_string( $value ) )
+			$message .= ' Passed string "'.str_replace( '"', '\\"', $value).'"';
 		else
 			$message .= " Passed ".gettype($value).": ".json_encode( $value );
 		return new static( $message );

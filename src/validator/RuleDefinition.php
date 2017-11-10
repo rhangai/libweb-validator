@@ -25,12 +25,19 @@ class RuleDefinition {
 
 		// Try to get inline rules
 		$inlineName = __CLASS__.'::'.$name;
-		if ( is_callable( $inlineName ) )
+		if ( is_callable( $inlineName ) ) {
+			$inlineCheck = __CLASS__.'::'.$name.'__check';
+			if ( is_callable( $inlineCheck ) )
+				call_user_func_array( $inlineCheck, $args );
 			return new rule\RuleInline( $inlineName, $args, 'v::'.$name );
+		}
 
 		// Try to get inline raw rules
 		$rawName = __CLASS__.'::'.$name.'__raw';
 		if ( is_callable( $rawName ) ) {
+			$inlineCheck = __CLASS__.'::'.$name.'__rawCheck';
+			if ( is_callable( $inlineCheck ) )
+				call_user_func_array( $inlineCheck, $args );
 			$rawSetupName = __CLASS__.'::'.$name.'__rawSetup';
 			$setup = is_callable( $rawSetupName ) ? $rawSetupName : null;
 			return new rule\RuleInlineRaw( $rawName, $setup, $args, 'v::'.$name );
@@ -119,9 +126,8 @@ class RuleDefinition {
 		} else
 			throw RuleException::createWithValue( "Value must be an int.", $value );
 	}
-
 	// Float value
-	public static function floatval( $value, $decimal = null, $thousands = null ) {
+	public static function floatval( $value, $decimal = null, $thousands = null, $asString = false ) {
 		$error = false;
 		if ( $decimal === null )
 			$decimal   = '.';
@@ -144,8 +150,13 @@ class RuleDefinition {
 			$split = explode( $decimal, $value );
 			if ( ( count($split) != 2 ) || ( !ctype_digit( $split[0] ) ) || ( !ctype_digit( $split[1] ) ) )
 				throw RuleException::createWithValue( "Value must be a float.", $value );
-			$value = ( $decimal === '.' ) ? floatval( $value ) : floatval( $split[0].'.'.$split[1] );
-			return $isNegative ? -$value : $value;
+			if ( $asString ) {
+				$value = ( $decimal === '.' ) ? $value : ( $split[0].'.'.$split[1] );
+				return $isNegative ? ('-'.$value) : $value;
+			} else {
+				$value = ( $decimal === '.' ) ? floatval( $value ) : floatval( $split[0].'.'.$split[1] );
+				return $isNegative ? -$value : $value;
+			}
 		} else
 			throw RuleException::createWithValue( "Value must be a float.", $value );
 	}
@@ -158,6 +169,38 @@ class RuleDefinition {
 		else
 			throw RuleException::createWithValue( "Value must be a boolean.", $value );
 	}
+	// Decimal value
+	public static function decimal__check( $digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null ) {
+		if ( !is_int( $digits ) || ( $digits <= 1 ) )
+			throw new \InvalidArgumentException( "Digis must be a positive integral > 1. $digits given" );
+		if ( !is_int( $decimal ) || ( $decimal < 0 ) )
+			throw new \InvalidArgumentException( "Decimal precision must be a positive integral or 0. $decimal given" );
+		if ( $decimal > $digits )
+			throw new \InvalidArgumentException( "Decimal precision must be less than digits. ($digits, $decimal) given" );
+		if ( !class_exists( '\\RtLopez\\Decimal' ) )
+			throw new \LogicException( "You must install rtlopez/decimal for decimal validator to work" );
+	}
+	public static function decimal( $value, $digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null ) {
+		if ( $value instanceof \RtLopez\Decimal )
+			$value = $value->format( null, '.', '' );
+		$value = self::floatval( $value, $decimalSeparator, $thousandsSeparator, true );
+		try {
+			$value = new impl\Decimal( $value, $decimal );
+		} catch ( \RtLopez\ConversionException $e ) {
+			throw RuleException::createWithValue( $e->getMessage(), $value );
+		}
+
+		$integralDigits = $digits - $decimal;
+		$max = \RtLopez\Decimal::create( '10', $decimal )->pow( $integralDigits );
+		$min = $max->mul( -1 );
+		if ( $value->ge( $max ) || $value->le( $min ) ) {
+			throw new RuleException( "Value out of range. Must be between ".$min->format(null, '.', '')." and ".$max->format( null, '.', '' ) );
+		}
+		
+		
+		return $value;
+	}
+
 	/// Check for type
 	public static function instanceOf( $value, $type ) {
 		if ( !$value instanceof $type )

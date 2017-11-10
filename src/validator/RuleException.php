@@ -7,9 +7,11 @@ class RuleException extends \Exception {
 	 */
 	public static function createWithValue( $message, $value ) {
 		if ( is_object( $value ) )
-			$message .= " Passed object of class ".get_class( $value );
-		else
-			$message .= " Passed ".gettype( $value ).": ".$value;
+			$message .= " Passed Object(".get_class( $value ).")";
+		else if ( is_array( $value ) )
+			$message .= " Passed Array";
+		else if ( is_array( $value ) )
+			$message .= " Passed ".gettype($value).": ".json_encode( value );
 		return new static( $message );
 	}
 

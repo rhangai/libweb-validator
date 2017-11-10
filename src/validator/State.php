@@ -3,6 +3,9 @@ namespace LibWeb\validator;
 
 class State {
 
+	const FLAG_SKIP = 0x01;
+
+
 	/// Value variable
 	public $value;
 	/**
@@ -52,16 +55,26 @@ class State {
 		$this->subrules_[ $key ] = $rule;
 	}
 	/**
+	 * Set the flags
+	 */
+	public function setFlag( $flags, $set = false ) {
+		$this->flags_ = ($set ? $flags : ($this->flags_ | $flags));
+	}
+	/**
+	 * Set the flags
+	 */
+	public function testFlag( $flag ) {
+		return ( $this->flags_ & $flag ) === $flag;
+	}
+	/**
 	 * Create a dependency on the given key
 	 */
 	public function dependsOn( $key ) {
-		$this->dependencies_[] = $key;
-	}
-	/**
-	 * Get the dependencies on the state
-	 */
-	public function addDependency( $field ) {
-	    $this->dependencies_[] = $field;
+		if ( is_array( $key ) ) {
+			foreach( $key as $k )
+				$this->dependencies_[] = $k;
+		} else 
+			$this->dependencies_[] = $key;
 	}
 	/**
 	 * Get the dependencies on the state
@@ -110,11 +123,10 @@ class State {
 				return new getter\ArrayGetter( $value );
 			else if ( is_callable( array( $value, 'validatorGet' ) ) )
 				return $value;
-			return false;
 		} else if ( is_array( $value ) ) {
 			return new getter\ArrayGetter( $value );
 		}
-		return false;
+		return new getter\NullGetter();
 	}
 
 	private $initial_;
@@ -122,6 +134,7 @@ class State {
 	private $parent_;
 	private $getter_;
 	private $done_;
+	private $flags_ = 0;
 	private $subrules_ = array();
 	private $errors_ = array();
 	private $dependencies_ = array();

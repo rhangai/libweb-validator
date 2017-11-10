@@ -158,7 +158,7 @@ class RuleDefinition {
 			throw RuleException::createWithValue( "Value must be a boolean.", $value );
 	}
 	/// Check for type
-	public static function is( $value, $type ) {
+	public static function instanceOf( $value, $type ) {
 		if ( !$value instanceof $type )
 			throw RuleException::createWithValue( "Value must be of type $type.", $value );
 	}

@@ -6,15 +6,19 @@ use LibWeb\validator\Rule;
 class RuleInline implements Rule {
 
 	/// Construct the inline rule
-	public function __construct( $fn, $name = null ) {
+	public function __construct( $fn, $args = array(), $name = null ) {
 		$this->fn_ = $fn;
+		$this->args_ = $args;
+		$this->name_ = $name;
 	}
 	/// No need to setup this inline rule
 	public function setup( $state ) {}
 	/// Apply the rule
 	public function apply( $state ) {
 		try {
-			$result = call_user_func( $this->fn_, $state->value );
+			$args = $this->args_;
+			array_unshift( $args, $state->value );
+			$result = call_user_func_array( $this->fn_, $args );
 		} catch ( \Exception $e ) {
 			$result = $e;
 		}
@@ -30,5 +34,6 @@ class RuleInline implements Rule {
 	}
 
 	private $fn_;
+	private $args_;
 	private $name_;
 };

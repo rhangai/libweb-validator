@@ -58,6 +58,7 @@ $data = v::validate( $data, array(
     )),
 ));
 ```
+
 <a name="api"></a>
 API Reference
 ======================
@@ -69,6 +70,7 @@ Summary
   - [`arrayOf($rule)`](#api-array-of)
   - [`boolval()`](#api-boolval)
   - [`b()`](#api-boolval)
+  - [`date($format = null, $out = null)`](#api-date)
   - [`decimal($digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null)`](#api-decimal)
   - [`floatval($decimal = null, $thousands = null, $asString = false)`](#api-floatval)
   - [`f($decimal = null, $thousands = null, $asString = false)`](#api-floatval)
@@ -130,6 +132,10 @@ Methods
 - <a name="api-cpf"></a> `cpf()`
 
   Brazilian CPF validator
+
+- <a name="api-date"></a> `date($format = null, $out = null)`
+
+  Convert the value to a date using the format (or keep if alredy a \DateTime)
 
 - <a name="api-decimal"></a> `decimal($digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null)`
 

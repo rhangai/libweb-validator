@@ -18,17 +18,22 @@ class ReferenceBuilder {
 		if ( !$method instanceof ReflectionMethod )
 			throw new \InvalidArgumentException( "Must be a reflection" );
 
-		$name = self::parseName( $method->name );
+		$name = self::parseName( $method->name, $type );
 		if ( $name === false )
 			return;
 
 		$anchor = self::getAnchorName( $name );
+
+		$parameters = $method->getParameters();
+		if ( $type === 'inline' || $type === 'raw' )
+			array_shift( $parameters );
+
 		
 		$this->methods_[ $name ] = (object) array(
 			"reflection" => $method,
 			"name"   => $name,
 			'anchor' => $anchor,
-			"params" => self::parseParameters( $method->getParameters() ),
+			"params" => self::parseParameters( $parameters ),
 			"docs"   => self::parseDocComment( $method->getDocComment() ),
 		);
 	}
@@ -139,15 +144,19 @@ class ReferenceBuilder {
 		return 'api-'.$name;
 	}
 
-	private static function parseName( $name ) {
+	private static function parseName( $name, &$type = null ) {
+		$type = null;
 		if ( $name === 'getRule' )
 			return false;
-		else if ( substr( $name, -5 ) === '__raw' )
+		else if ( substr( $name, -5 ) === '__raw' ) {
+			$type = 'raw';
 			return substr( $name, 0, -5 );
-		else if ( substr( $name, -9 ) === '__factory' )
+		} else if ( substr( $name, -9 ) === '__factory' ) {
+			$type = 'factory';
 			return substr( $name, 0, -9 );
-		else if ( strpos( $name, '__' ) !== false )
+		} else if ( strpos( $name, '__' ) !== false )
 			return false;
+		$type = 'inline';
 		return $name;
 	}
 

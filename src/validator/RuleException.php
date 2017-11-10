@@ -10,8 +10,8 @@ class RuleException extends \Exception {
 			$message .= " Passed Object(".get_class( $value ).")";
 		else if ( is_array( $value ) )
 			$message .= " Passed Array";
-		else if ( is_array( $value ) )
-			$message .= " Passed ".gettype($value).": ".json_encode( value );
+		else
+			$message .= " Passed ".gettype($value).": ".json_encode( $value );
 		return new static( $message );
 	}
 

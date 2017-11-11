@@ -229,6 +229,15 @@ class RuleDefinition {
 	public static function call__factory( $fn ) {
 		return new rule\RuleInline( $fn, array(), 'call' );
 	}
+	/// Invoke the function $fn on the object
+	public static function invoke( $value, $fn ) {
+		$args = array_slice( func_get_args(), 2 );
+		return self::invokeArray( $value, $fn, $args );
+	}
+	/// Invoke the function $fn on the object using array as args
+	public static function invokeArray( $value, $fn, $args = array() ) {
+		return call_user_func_array( array( $value, $fn ), $args );
+	}
 	/// Check if value is in set
 	public static function set( $value, $items ) {
 		if ( !in_array( $value, $items ) )
@@ -242,16 +251,38 @@ class RuleDefinition {
 	}
 
 	// ================ Numeric rules =======================
-	/// Range validator
-	public static function range( $value, $min, $max ) {
-		if ( is_int( $value ) ) {
-			if ( ( $value < $min ) || ( $value > $max ) )
-				throw RuleException::createWithValue( "Value must be between [$min, $max].", $value );
-		} else if ( is_float( $value ) ) {
+	/// Check if object is between two numbers (inside range)
+	public static function between__factory( $min, $max ) {
+		if ( class_exists( '\\RtLopez\\Decimal' ) )
+			return new rule\RuleInline( __CLASS__.'::between__implDecimal', [ $min, $max ], 'between' );
+		else
+			return new rule\RuleInline( __CLASS__.'::between__implDefault', [ $min, $max ], 'between' );
+	}
+	public static function between__implDefault( $value, $min, $max ) {
+		if ( is_int( $value ) || is_float( $value ) ) {
 			if ( ( $value < $min ) || ( $value > $max ) )
 				throw RuleException::createWithValue( "Value must be between [$min, $max].", $value );
 		} else
+			throw RuleException::createWithValue( "Cannot validate range [$min, $max] because value is not a number.", $value );
+	}
+	public static function between__implDecimal( $value, $min, $max ) {
+	    if ( is_int( $value ) || is_float( $value ) || ( $value instanceof \RtLopez\Decimal ) ) {
+			if ( self::between__implLessThan( $value, $min ) || self::between__implLessThan( $max, $value ) )
+				throw RuleException::createWithValue( "Value must be between [$min, $max].", $value );
+		} else
 			throw RuleException::createWithValue( "Cannot validate range [$min, $max].", $value );
+	}
+    public static function between__implLessThan( $a, $b ) {
+		if ( ( $a === INF ) || ( $b === -INF ) )
+			return false;
+		else if ( ( $a === -INF ) || ( $b === INF ) )
+			return true;
+		else if ( $a instanceof \RtLopez\Decimal )
+			return $a->lt( $b );
+		else if ( $b instanceof \RtLopez\Decimal ) {
+			return $b->ge( $a );
+		}
+		return $a < $b;
 	}
 
 

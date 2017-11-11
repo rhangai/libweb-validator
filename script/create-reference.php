@@ -2,11 +2,15 @@
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
+/**
+ * Builds the reference
+ */
 class ReferenceBuilder {
 
 	private $methods_ = array();
 	private $aliases_ = array();
 
+	// Add a new method alias
 	public function addAlias( $method, $alias ) {
 		if ( isset( $this->aliases_[ $method ] ) )
 			$this->aliases_[ $method ][] = $alias;
@@ -14,6 +18,7 @@ class ReferenceBuilder {
 			$this->aliases_[ $method ] = array( $alias );
 	}
 
+	// Add a new Reflection Method
 	public function addMethod( $method ) {
 		if ( !$method instanceof ReflectionMethod )
 			throw new \InvalidArgumentException( "Must be a reflection" );
@@ -38,6 +43,7 @@ class ReferenceBuilder {
 		);
 	}
 
+	// Refresh every method defined
 	public function refreshMethods() {
 		$cache = array();
 
@@ -83,7 +89,35 @@ class ReferenceBuilder {
 		
 		
 	}
+	/**
+	 * Try to rewrite the given file
+	 */
+	public function rewrite( $file ) {
+		$fp = fopen( $file, "r+" );
+		
+		$valid = false;
+		while ( true ) {
+			$pos = ftell( $fp );
+			$buffer = fgets( $fp );
+			if ( $buffer === false )
+				break;
+			if (strpos($buffer, '<a name="api"></a>') !== false) {
+				$valid = true;
+				break; 
+			}      
+		}
+		
+		if ( !$valid )
+			fseek( $fp, 0, SEEK_END );
+		else
+			fseek( $fp, $pos, SEEK_SET );
 
+		$this->appendStream( $fp );
+		fclose( $fp );
+	}
+	/**
+	 * Write the reference to a single stream
+	 */
 	public function appendStream( $stream ) {
 		// Sort by name
 		$methodList = $this->methods_;
@@ -133,8 +167,9 @@ class ReferenceBuilder {
 			
 		}
 	}
-
-
+	/**
+	 * Get an anchor name for the given method name
+	 */
 	private static function getAnchorName( $name ) {
 	    $name = preg_replace_callback( '/([a-z])([A-Z])/', function( $matches ) {
 			return $matches[1].'-'.mb_strtolower( $matches[2] );
@@ -143,7 +178,9 @@ class ReferenceBuilder {
 	    $name = preg_replace( '/[^a-z]/', '-', $name );
 		return 'api-'.$name;
 	}
-
+	/**
+	 * Parse a method name to extract a validator name
+	 */
 	private static function parseName( $name, &$type = null ) {
 		$type = null;
 		if ( $name === 'getRule' )
@@ -159,7 +196,9 @@ class ReferenceBuilder {
 		$type = 'inline';
 		return $name;
 	}
-
+	/**
+	 * Parse the parameters list to extract the parameter string  
+	 */
 	private static function parseParameters( $reflectionParameterList ) {
 		$params = array();
 		foreach ( $reflectionParameterList as $reflectionParameter ) {
@@ -186,6 +225,7 @@ class ReferenceBuilder {
 		return '('.implode( ', ', $paramStr ). ')';
 	}
 
+	/// Parse the doc comment
 	private static function parseDocComment( $comment ) {
 		if ( !$comment )
 			return $comment;
@@ -194,6 +234,11 @@ class ReferenceBuilder {
 	}
 }
 
+/**
+   
+   Read the definitions and write to README.md
+   
+ */
 function main() {
 	$builder = new ReferenceBuilder();
 
@@ -211,9 +256,9 @@ function main() {
 	foreach ( $propertyAlias->getValue() as $alias => $method ) {
 		$builder->addAlias( $method, $alias );
 	}
-	
-	//$builder->write( dirname( __DIR__ ).'/README.md' );
-	$builder->appendStream( STDOUT );
+
+	// Rewrite file
+	$builder->rewrite( dirname( __DIR__ ).'/README.md' );
 }
 
 main();

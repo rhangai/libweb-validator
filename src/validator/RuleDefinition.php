@@ -86,12 +86,6 @@ class RuleDefinition {
 		$state->dependsOn( $fields );
 	}
 
-	// ============== Mixed ================
-	/// Call the function $fn to validate the value
-	public static function call__factory( $fn ) {
-		return new rule\RuleInline( $fn, array(), 'call' );
-	}
-
 	// =============== Type validators ================
 	/// Validate all objects
 	public static function any( $value ) {
@@ -229,6 +223,23 @@ class RuleDefinition {
 		}
 	}
 
+	
+	// ============== Mixed ================
+	/// Call the function $fn to validate the value
+	public static function call__factory( $fn ) {
+		return new rule\RuleInline( $fn, array(), 'call' );
+	}
+	/// Check if value is in set
+	public static function set( $value, $items ) {
+		if ( !in_array( $value, $items ) )
+			throw RuleException::createWithValue( "Value must be in ".json_encode( $items ), $value );
+	}
+	/// Map a value to another
+	public static function map( $value, $map ) {
+		if ( !array_key_exists( $value, $map  ) )
+			throw RuleException::createWithValue( "Value must be one of ".json_encode( array_keys( $map ) ), $value );
+		return new rule\RuleInlineValue( $map[ $value ] );
+	}
 
 	// ================ Numeric rules =======================
 	/// Range validator

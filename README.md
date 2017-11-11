@@ -99,6 +99,8 @@ Summary
   - [`whitelist($chars)`](#api-whitelist)
 - Mixed
   - [`call($fn)`](#api-call)
+  - [`map($map)`](#api-map)
+  - [`set($items)`](#api-set)
 - Locale rules
   - [`cnpj()`](#api-cnpj)
   - [`cpf()`](#api-cpf)
@@ -170,6 +172,10 @@ Methods
 
   Check for string or array length
 
+- <a name="api-map"></a> `map($map)`
+
+  Map a value to another
+
 - <a name="api-minlen"></a> `minlen($min)`
 
   Check if string has at least $min length
@@ -198,6 +204,10 @@ Methods
 
   Required validator (Fails if null or '')
 
+- <a name="api-set"></a> `set($items)`
+
+  Check if value is in set
+
 - <a name="api-skippable"></a> `skippable()`
 
   Skippable validator (Bypass if null or '' and does not set the property)
@@ -213,4 +223,3 @@ Methods
 - <a name="api-whitelist"></a> `whitelist($chars)`
 
   Remove any char NOT found in $chars from the string
-

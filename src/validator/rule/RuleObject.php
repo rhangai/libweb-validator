@@ -52,7 +52,7 @@ class RuleObject implements Rule {
 				$state->mergeErrorsFrom( $child );
 				continue;
 			}
-			$state->setCurrentRuleFor( $key, $rule );
+			$state->setCurrentRuleFor( $key, $rule, $child->value );
 			if ( $child->testFlag( State::FLAG_SKIP ) )
 				continue;
 			$value[$key] = $child->value;			

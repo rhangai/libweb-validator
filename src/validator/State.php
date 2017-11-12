@@ -51,8 +51,21 @@ class State {
 	/**
 	 * Set the rule used to validate a single key
 	 */
-	public function setCurrentRuleFor( $key, $rule ) {
-		$this->subrules_[ $key ] = $rule;
+	public function setCurrentRuleFor( $key, $rule, $value ) {
+		$this->subrules_[ $key ] = array(
+			"rule"  => $rule,
+			"value" => $value,
+		);
+	}
+	/**
+	 * Get the rule used to validate a single key
+	 */
+	public function getCurrentRuleFor( $key, &$value = null ) {
+		$subrule = @$this->subrules_[ $key ];
+		if ( !$subrule )
+			return null;
+		$value = $subrule[ "value" ];
+		return $subrule["rule"];
 	}
 	/**
 	 * Set the flags

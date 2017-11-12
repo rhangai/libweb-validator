@@ -125,9 +125,9 @@ class RuleDefinition {
 			$decimal   = '.';
 
 		if ( is_int( $value ) ) {
-		    return true;
+		    return $value;
 		} else if ( is_float( $value ) ) {
-		    return true;
+		    return $value;
 		} else if ( is_string( $value ) ) {
 			$value = trim( $value );
 			$isNegative = ( @$value[0] === '-' );
@@ -249,7 +249,24 @@ class RuleDefinition {
 			throw RuleException::createWithValue( "Value must be one of ".json_encode( array_keys( $map ) ), $value );
 		return new rule\RuleInlineValue( $map[ $value ] );
 	}
-
+	/// Check if member will validate just as the other fields
+	public static function sameAs__raw( $state, $field ) {
+		$parent = $state->getParent();
+		$rule   = $parent->getCurrentRuleFor( $field, $fieldValue );
+		if ( !$rule )
+			return;
+		Validator::validateState( $state, $rule );
+		if ( $state->getErrors() )
+			return;
+		if ( $state->value != $fieldValue )
+			$state->addError( RuleException::createWithValue( "Value must match the field '$field'", $state->value ) );
+	}
+	public static function sameAs__rawSetup( $state, $field ) {
+		$parent = $state->getParent();
+		if ( !$parent )
+			throw new \LogicException( "Must use sameAs rule on an object" );
+		$state->dependsOn( $field );
+	}
 	// ================ Numeric rules =======================
 	/// Check if object is between two numbers (inside range)
 	public static function between__factory( $min, $max ) {

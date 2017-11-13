@@ -30,8 +30,9 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"LibWeb\\": "src"
-		}
+			"LibWeb\\validator\\": "src/validator"
+		},
+		"classmap": ["src/Validator.php", "src/ValidatorException.php"]
 	},
 	"version": "1.2.0"
 }

@@ -1,6 +1,7 @@
 <?php
 namespace LibWeb\validator\rule;
 
+use LibWeb\Validator;
 use LibWeb\validator\Rule;
 
 class RuleInline implements Rule {
@@ -26,6 +27,10 @@ class RuleInline implements Rule {
 			return;
 		if ( ( $result === false ) || ( $result instanceof \Exception ) ) {
 			$state->addError( "Could not validate ".($this->name_ ?: ""), $result );
+			return;
+		}
+		if ( $result instanceof Rule ) {
+			Validator::validateState( $state, $result );
 			return;
 		}
 		if ( $result instanceof RuleInlineValue )

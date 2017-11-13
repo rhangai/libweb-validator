@@ -23,6 +23,25 @@ class Validator {
 		$rule->setup( $state );
 		$rule->apply( $state );
 	}
+	/// Add a new inline rule
+	public static function addInlineRule( $name, $rule ) {
+		self::addRuleInline( $name, $rule );
+	}
+	/// Add a new inline rule
+	public static function addRuleInline( $name, $rule ) {
+		validator\RuleDefinition::addCustomRule( $name, array(
+			"type" => "inline",
+			"rule" => $rule,
+		) );
+	}
+	/// Add a new raw rule
+	public static function addRuleRaw( $name, $rule, $setup = null ) {
+		validator\RuleDefinition::addCustomRule( $name, array(
+			"type"  => "raw",
+			"rule"  => $rule,
+			"setup" => $setup,
+		) );
+	}
 	/// Normalize a rule
 	public static function normalizeRule( $rule ) {
 		if ( is_array( $rule ) )

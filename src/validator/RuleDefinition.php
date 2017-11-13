@@ -12,12 +12,35 @@ class RuleDefinition {
 		'f' => 'floatval',
 		'b' => 'boolval'
 	);
+	// Custom rules
+	private static $customRules = array();
+	// Add custom rule
+	public static function addCustomRule( $name, $definition ) {
+		$definition = (object) $definition;
+		self::$customRules[ $name ] = $definition;
+	}
 	/**
 	 * Get a single rule definition
 	 */
 	public static function getRule( $name, $args ) {
 		if ( $name === 'getRule' )
 			throw new \InvalidArgumentException( "'getRule' is a reserved name" );
+
+
+		// Custom rules
+		if ( isset( self::$customRules[ $name ] ) ) {
+			$customRule = self::$customRules[ $name ];
+			if ( $customRule->type === 'inline' ) {
+				if ( $customRule->rule instanceof Rule )
+					return $customRule->rule;
+				return new rule\RuleInline( $customRule->rule, $args, 'v::'.$name );
+			} else if ( $customRule->type === 'raw' ) 
+				return new rule\RuleInlineRaw( $customRule->rule, $customRule->setup, $args, 'v::'.$name );
+			else if ( $customRule->type === 'factory' ) 
+				return call_user_func_array( $customRule->rule, $args );
+			else
+				throw new \LogicException( "Should not get here" );
+		}
 
 		/// Check for alias
 		if ( isset( self::$alias[$name] ) )

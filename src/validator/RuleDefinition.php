@@ -197,15 +197,17 @@ class RuleDefinition {
 	}
 	/// Convert the value to a decimal with $digits and $decimal (needs rtlopes\Decimal)
 	public static function decimal( $value, $digits, $decimal, $decimalSeparator = null, $thousandsSeparator = null ) {
-		if ( $value instanceof \RtLopez\Decimal )
-			$value = $value->format( null, '.', '' );
-		$value = self::floatval( $value, $decimalSeparator, $thousandsSeparator, true );
-		try {
+		if ( $value instanceof \RtLopez\Decimal ) {
 			$value = new impl\Decimal( $value, $decimal );
-		} catch ( \RtLopez\ConversionException $e ) {
-			throw RuleException::createWithValue( $e->getMessage(), $value );
+		} else {
+			$value = self::floatval( $value, $decimalSeparator, $thousandsSeparator, true );
+			try {
+				$value = new impl\Decimal( $value, $decimal );
+			} catch ( \RtLopez\ConversionException $e ) {
+				throw RuleException::createWithValue( $e->getMessage(), $value );
+			}
 		}
-
+		
 		$integralDigits = $digits - $decimal;
 		$max = \RtLopez\Decimal::create( '10', $decimal )->pow( $integralDigits );
 		$min = $max->mul( -1 );

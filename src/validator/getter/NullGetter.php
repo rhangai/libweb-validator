@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator\getter;
+namespace libweb\validator\getter;
 
 /**
  * Always get a null value

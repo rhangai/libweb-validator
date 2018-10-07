@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator\getter;
+namespace libweb\validator\getter;
 
 /**
  * Get the keys on an array (or array like object)

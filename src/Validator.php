@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb;
+namespace libweb;
 
 /**
  * Validator main class

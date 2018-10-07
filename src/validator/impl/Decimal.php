@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator\impl;
+namespace libweb\validator\impl;
 
 /**
  * Implements the Decimal class compatible with LibWeb

@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator;
+namespace libweb\validator;
 
 use PHPUnit\Framework\TestCase;
 

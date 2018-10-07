@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator\rule;
+namespace libweb\validator\rule;
 
 use LibWeb\Validator;
 use LibWeb\validator\Rule;

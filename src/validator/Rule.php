@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator;
+namespace libweb\validator;
 
 /**
  * Basic interface for a rule

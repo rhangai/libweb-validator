@@ -1,5 +1,5 @@
 <?php
-namespace LibWeb\validator\rule;
+namespace libweb\validator\rule;
 class RuleInlineValue {
 	public function __construct( $value ) {
 		$this->value_ = $value;

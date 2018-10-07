@@ -1,0 +1,12 @@
+{
+  "name": "libweb-validator",
+  "version": "2.0.0",
+  "main": "index.js",
+  "repository": "https://renanhangai@github.com/renanhangai/libweb-validator",
+  "author": "renanhangai <hangai.renan@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "standard-version": "^4.4.0"
+  },
+  "private": true
+}

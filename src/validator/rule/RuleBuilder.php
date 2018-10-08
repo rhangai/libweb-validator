@@ -1,9 +1,9 @@
 <?php
 namespace libweb\validator\rule;
 
-use LibWeb\Validator;
-use LibWeb\validator\Rule;
-use LibWeb\validator\RuleDefinition;
+use libweb\Validator;
+use libweb\validator\Rule;
+use libweb\validator\RuleDefinition;
 
 class RuleBuilder implements Rule {
 

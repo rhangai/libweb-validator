@@ -1,7 +1,7 @@
 <?php
 namespace libweb;
 
-use LibWeb\Validator as v;
+use libweb\Validator as v;
 use PHPUnit\Framework\TestCase;
 
 class TestValidator extends TestCase {

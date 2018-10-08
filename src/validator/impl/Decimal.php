@@ -2,7 +2,7 @@
 namespace libweb\validator\impl;
 
 /**
- * Implements the Decimal class compatible with LibWeb
+ * Implements the Decimal class compatible with libweb
  */
 class Decimal extends \RtLopez\DecimalBCMath {
 

@@ -1,7 +1,7 @@
 <?php
 namespace libweb\validator\rule;
 
-use LibWeb\validator\Rule;
+use libweb\validator\Rule;
 
 class RuleInlineRaw implements Rule {
 

@@ -1,7 +1,7 @@
 <?php
 namespace libweb\validator;
 
-use LibWeb\Validator;
+use libweb\Validator;
 
 class RuleDefinition {
 

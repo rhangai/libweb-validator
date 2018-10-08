@@ -1,8 +1,8 @@
 <?php
 namespace libweb\validator\rule;
 
-use LibWeb\Validator;
-use LibWeb\validator\Rule;
+use libweb\Validator;
+use libweb\validator\Rule;
 
 class RuleInline implements Rule {
 

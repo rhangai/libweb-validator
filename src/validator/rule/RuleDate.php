@@ -1,8 +1,8 @@
 <?php
 namespace libweb\validator\rule;
 
-use LibWeb\validator\Rule;
-use LibWeb\validator\RuleException;
+use libweb\validator\Rule;
+use libweb\validator\RuleException;
 
 /// Internal date time object
 class ValidatorDateTime extends \DateTime {

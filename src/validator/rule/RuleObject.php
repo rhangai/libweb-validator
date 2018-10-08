@@ -1,9 +1,9 @@
 <?php
 namespace libweb\validator\rule;
 
-use LibWeb\Validator;
-use LibWeb\validator\Rule;
-use LibWeb\validator\State;
+use libweb\Validator;
+use libweb\validator\Rule;
+use libweb\validator\State;
 use MJS\TopSort\Implementations\StringSort;
 
 class RuleObject implements Rule {

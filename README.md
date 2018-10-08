@@ -13,7 +13,7 @@ Getting Started
 -------------------------------------
 Simply validate some data
 ```php
-use LibWeb\Validator as v;
+use libweb\Validator as v;
 
 // Data to be validated
 $data = array(
@@ -36,7 +36,7 @@ Another Example
 -------------------------------------
 Simply validate some data
 ```php
-use LibWeb\Validator as v;
+use libweb\Validator as v;
 
 $data = array(
     "name" => "John Doe",

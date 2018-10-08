@@ -242,7 +242,7 @@ class ReferenceBuilder {
 function main() {
 	$builder = new ReferenceBuilder();
 
-	$reflection = new ReflectionClass( '\\LibWeb\\validator\\RuleDefinition' );
+	$reflection = new ReflectionClass( '\\libweb\\validator\\RuleDefinition' );
 
 	// Add methods
 	foreach ( $reflection->getMethods() as $method ) {

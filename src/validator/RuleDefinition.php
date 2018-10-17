@@ -223,6 +223,10 @@ class RuleDefinition {
 		if ( !$value instanceof $type )
 			throw RuleException::createWithValue( "Value must be of type $type.", $value );
 	}
+	/// Check if the object is an instance of an uploaded file
+	public static function uploadedFile( $value ) {
+		return self::instanceOf( $value, "\\Psr\\Http\\Message\\UploadedFileInterface" );
+	}
 	/// Convert the value to an object and validate its fields
 	public static function obj__factory( $definition ) {
 		return new rule\RuleObject( $definition );

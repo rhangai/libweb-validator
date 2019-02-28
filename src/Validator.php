@@ -42,6 +42,10 @@ class Validator {
 			"setup" => $setup,
 		) );
 	}
+	/// Add a new raw rule
+	public static function addRuleDefinitionClass( $definitionClass ) {
+		validator\RuleDefinition::addCustomRuleDefinitionClass( $definitionClass );
+	}
 	/// Normalize a rule
 	public static function normalizeRule( $rule ) {
 		if ( is_array( $rule ) )

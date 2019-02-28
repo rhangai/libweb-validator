@@ -14,10 +14,16 @@ class RuleDefinition {
 	);
 	// Custom rules
 	private static $customRules = array();
+	private static $customRuleDefinitionClass = [];
 	// Add custom rule
 	public static function addCustomRule( $name, $definition ) {
 		$definition = (object) $definition;
 		self::$customRules[ $name ] = $definition;
+	}
+	// Add custom rule definition class
+	public static function addCustomRuleDefinitionClass( $definitionClass ) {
+		if ( !in_array( $definitionClass, self::$customRuleDefinitionClass ) )
+			self::$customRuleDefinitionClass[] = $definitionClass;
 	}
 	/**
 	 * Get a single rule definition
@@ -25,7 +31,6 @@ class RuleDefinition {
 	public static function getRule( $name, $args ) {
 		if ( $name === 'getRule' )
 			throw new \InvalidArgumentException( "'getRule' is a reserved name" );
-
 
 		// Custom rules
 		if ( isset( self::$customRules[ $name ] ) ) {
@@ -42,37 +47,52 @@ class RuleDefinition {
 				throw new \LogicException( "Should not get here" );
 		}
 
+		$rule = null;
+		foreach ( self::$customRuleDefinitionClass as $class ) {
+			$rule = self::getRuleFromClass( $class, $name, $args );
+			if ( $rule )
+				return $rule;
+		}
+
+		$rule = self::getRuleFromClass( __CLASS__, $name, $args );
+		if ( $rule )
+			return $rule;
+
+		// Could not get any rule
+		throw new \InvalidArgumentException( "Invalid rule: ".$name );
+	}
+	/// Get a rule from a class according to the definition
+	private static function getRuleFromClass( $class, $name, $args ) {
 		/// Check for alias
-		if ( isset( self::$alias[$name] ) )
-			$name = self::$alias[$name];
+		if ( isset( $class::$alias[$name] ) )
+			$name = $class::$alias[$name];
 
 		// Try to get inline rules
-		$inlineName = __CLASS__.'::'.$name;
+		$inlineName = $class.'::'.$name;
 		if ( is_callable( $inlineName ) ) {
-			$inlineCheck = __CLASS__.'::'.$name.'__check';
+			$inlineCheck = $class.'::'.$name.'__check';
 			if ( is_callable( $inlineCheck ) )
 				call_user_func_array( $inlineCheck, $args );
 			return new rule\RuleInline( $inlineName, $args, 'v::'.$name );
 		}
 
 		// Try to get inline raw rules
-		$rawName = __CLASS__.'::'.$name.'__raw';
+		$rawName = $class.'::'.$name.'__raw';
 		if ( is_callable( $rawName ) ) {
-			$inlineCheck = __CLASS__.'::'.$name.'__rawCheck';
+			$inlineCheck = $class.'::'.$name.'__rawCheck';
 			if ( is_callable( $inlineCheck ) )
 				call_user_func_array( $inlineCheck, $args );
-			$rawSetupName = __CLASS__.'::'.$name.'__rawSetup';
+			$rawSetupName = $class.'::'.$name.'__rawSetup';
 			$setup = is_callable( $rawSetupName ) ? $rawSetupName : null;
 			return new rule\RuleInlineRaw( $rawName, $setup, $args, 'v::'.$name );
 		}
 
 		// Try to get factory rules
-		$factoryName = __CLASS__.'::'.$name.'__factory';
+		$factoryName = $class.'::'.$name.'__factory';
 		if ( is_callable( $factoryName ) )
 			return call_user_func_array( $factoryName, $args );
 
-		// Could not get any rule
-		throw new \InvalidArgumentException( "Invalid rule: ".$name );
+		return null;
 	}
 
 	// =============== Obligatoriness ================

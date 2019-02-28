@@ -300,6 +300,7 @@ class RuleDefinition {
 	}
 	/// Check if member will validate just as the other fields
 	public static function sameAs__raw( $state, $field ) {
+		$fieldValue = null;
 		$parent = $state->getParent();
 		$rule   = $parent->getCurrentRuleFor( $field, $fieldValue );
 		if ( !$rule )

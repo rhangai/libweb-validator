@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [2.2.0](https://github.com/renanhangai/libweb-validator/compare/v2.1.1...v2.2.0) (2019-02-28)
+
+
+### Bug Fixes
+
+* Warning with $fieldValue variable ([adc66c6](https://github.com/renanhangai/libweb-validator/commit/adc66c6))
+
+
+### Features
+
+* Added addRuleDefinitionClass method to help add loaders ([e38d059](https://github.com/renanhangai/libweb-validator/commit/e38d059))
+
+
+
 <a name="2.1.1"></a>
 ## [2.1.1](https://github.com/renanhangai/libweb-validator/compare/v2.1.0...v2.1.1) (2018-11-12)
 

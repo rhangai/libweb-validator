@@ -1,6 +1,6 @@
 {
   "name": "libweb-validator",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "main": "index.js",
   "repository": "https://renanhangai@github.com/renanhangai/libweb-validator",
   "author": "renanhangai <hangai.renan@gmail.com>",

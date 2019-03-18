@@ -36,6 +36,5 @@
 			"src/Validator.php",
 			"src/ValidatorException.php"
 		]
-	},
-	"version": "2.2.0"
+	}
 }

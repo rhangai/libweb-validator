@@ -383,6 +383,10 @@ class RuleDefinition {
 	public static function minlen( $value, $min ) {
 		return self::len( $value, $min, INF );
 	}
+	/// Check if string has at most $max length
+	public static function maxlen( $value, $max ) {
+		return self::len( $value, 0, $max );
+	}
 	/// Replace the characters on the string
 	public static function str_replace( $value, $search, $replace ) {
 		$value = self::strval( $value, false );

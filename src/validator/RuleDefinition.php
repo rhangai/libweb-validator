@@ -119,7 +119,21 @@ class RuleDefinition {
 			$state->setDone();
 		}
 	}
-
+	/** Optional validator If a condition is met */
+	public static function optionalIf__raw( $state, $isOptional ) {
+		if ( $isOptional )
+			return self::optional__raw( $state );
+		return self::required__raw( $state );
+	}
+	/** Required validator only if a condition is met */
+	public static function requiredIf__raw( $state, $isRequired ) {
+		return self::optionalIf__raw( $state, !$isRequired );
+	}
+	/** Skippable validator If a condition is met */
+	public static function skippableIf__raw( $state, $isSkippable ) {
+		if ( $isSkippable )
+			return self::skippable__raw( $state );
+	}
 
 	// =============== Meta ================
 	/** Add a rule dependency. (Only works for objects) */

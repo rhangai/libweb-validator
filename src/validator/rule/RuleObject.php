@@ -65,7 +65,10 @@ class RuleObject implements Rule {
 		$len  = strlen( $key );
 		if ( $len <= 0 )
 			return $rule;
-		if ( $key[$len - 1] === '?' ) {
+		if ($key[$len - 1] === '!') {
+			$key = substr($key, 0, $len - 1);
+			return $rule;
+		} elseif ( $key[$len - 1] === '?' ) {
 			if ( $len >= 2 && $key[ $len - 2 ] === '?' ) {
 				$key = substr( $key, 0, $len - 2 );
 				return Validator::skippable()->appendRule( $rule );

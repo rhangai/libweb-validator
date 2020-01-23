@@ -48,6 +48,10 @@ class ValidatorException extends \Exception {
 		return $this->stack;
 	}
 
+	public function getErrors() {
+		return $this->errors; 
+	}
+
 	private $errors;
 	private $fields;
 	private $serializable;

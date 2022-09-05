@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.4](https://github.com/renanhangai/libweb-validator/compare/v2.3.2...v2.3.4) (2022-09-05)
+
 ### [2.3.2](https://github.com/renanhangai/libweb-validator/compare/v2.3.1...v2.3.2) (2022-09-05)
 
 ### [2.3.1](https://github.com/renanhangai/libweb-validator/compare/v2.3.0...v2.3.1) (2020-01-23)

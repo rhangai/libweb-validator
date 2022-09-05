@@ -1,13 +1,13 @@
 {
   "name": "libweb-validator",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "main": "index.js",
   "repository": "https://renanhangai@github.com/renanhangai/libweb-validator",
   "author": "renanhangai <hangai.renan@gmail.com>",
   "license": "MIT",
   "devDependencies": {},
   "scripts": {
-    "release": "npx standard-version --bumpFiles package.json"
+    "release": "npx standard-version"
   },
   "private": true
 }
